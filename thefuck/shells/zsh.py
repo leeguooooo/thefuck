@@ -23,11 +23,13 @@ class Zsh(Generic):
                 export TF_SHELL_ALIASES;
                 TF_HISTORY="$(fc -ln -10)";
                 export TF_HISTORY;
+                export TF_PROMPT="$*";
                 export PYTHONIOENCODING=utf-8;
                 TF_CMD=$(
                     thefuck {argument_placeholder} $@
                 ) && eval $TF_CMD;
                 unset TF_HISTORY;
+                unset TF_PROMPT;
                 export PYTHONIOENCODING=$TF_PYTHONIOENCODING;
                 {alter_history}
             }}

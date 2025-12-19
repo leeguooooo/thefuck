@@ -106,10 +106,11 @@ class Settings(dict):
         elif attr == 'priority':
             return dict(self._priority_from_env(val))
         elif attr in ('wait_command', 'history_limit', 'wait_slow_command',
-                      'num_close_matches'):
+                      'num_close_matches', 'ai_timeout'):
             return int(val)
         elif attr in ('require_confirmation', 'no_colors', 'debug',
-                      'alter_history', 'instant_mode'):
+                      'alter_history', 'instant_mode', 'ai_enabled',
+                      'ai_stream', 'ai_stream_output'):
             return val.lower() == 'true'
         elif attr in ('slow_commands', 'excluded_search_path_prefixes'):
             return val.split(':')

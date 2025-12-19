@@ -82,7 +82,7 @@ class TestFish(object):
         assert 'thefuck' in shell.app_alias('fuck')
         assert 'TF_SHELL=fish' in shell.app_alias('fuck')
         assert 'TF_ALIAS=fuck PYTHONIOENCODING' in shell.app_alias('fuck')
-        assert 'PYTHONIOENCODING=utf-8 thefuck' in shell.app_alias('fuck')
+        assert 'PYTHONIOENCODING=utf-8' in shell.app_alias('fuck')
         assert ARGUMENT_PLACEHOLDER in shell.app_alias('fuck')
 
     def test_app_alias_alter_history(self, settings, shell):

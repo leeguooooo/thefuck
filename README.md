@@ -148,6 +148,14 @@ On other systems, install *The Fuck*  by using `pip`:
 pip install thefuck
 ```
 
+If you use [uv](https://github.com/astral-sh/uv), you can run it without a
+global install:
+
+```bash
+uvx thefuck --help
+uvx thefuck --setup
+```
+
 [Alternatively, you may use an OS package manager (OS X, Ubuntu, Arch).](https://github.com/nvbn/thefuck/wiki/Installation)
 
 <a href='#manual-installation' name='manual-installation'>#</a>
@@ -164,6 +172,27 @@ eval $(thefuck --alias FUCK)
 
 Changes are only available in a new shell session. To make changes immediately
 available, run `source ~/.bashrc` (or your shell config file like `.zshrc`).
+
+### AI setup (optional)
+
+Run the interactive setup to configure AI settings and shell integration:
+
+```bash
+thefuck setup
+# or:
+thefuck --setup
+```
+
+This writes an env file to `$XDG_CONFIG_HOME/thefuck/env.fish` (Fish) or
+`$XDG_CONFIG_HOME/thefuck/env.sh` (Bash/Zsh) and a wrapper to
+`$XDG_CONFIG_HOME/thefuck/bin/thefuck`. Source the env file in your shell
+config:
+
+```bash
+source $XDG_CONFIG_HOME/thefuck/env.fish
+# or:
+source $XDG_CONFIG_HOME/thefuck/env.sh
+```
 
 To run fixed commands without confirmation, use the `--yeah` option (or just `-y` for short, or `--hard` if you're especially frustrated):
 
@@ -453,6 +482,15 @@ Several *The Fuck* parameters can be changed in the file `$XDG_CONFIG_HOME/thefu
 * `slow_commands` &ndash; list of slow commands;
 * `num_close_matches` &ndash; the maximum number of close matches to suggest, by default `3`.
 * `excluded_search_path_prefixes` &ndash; path prefixes to ignore when searching for commands, by default `[]`.
+* `ai_enabled` &ndash; enable AI suggestions, by default `False`;
+* `ai_url` &ndash; AI endpoint URL;
+* `ai_token` &ndash; AI token (bearer);
+* `ai_model` &ndash; AI model name;
+* `ai_timeout` &ndash; AI timeout in seconds;
+* `ai_reasoning_effort` &ndash; `low`, `medium`, or `high`;
+* `ai_stream` &ndash; use SSE streaming, by default `True`;
+* `ai_stream_output` &ndash; stream AI output while waiting, by default `True`;
+* `ai_mode` &ndash; `prefer` (prepend AI suggestions) or `fallback`.
 
 An example of `settings.py`:
 
@@ -486,6 +524,15 @@ rule with lower `priority` will be matched first;
 * `THEFUCK_SLOW_COMMANDS` &ndash; list of slow commands, like `lein:gradle`;
 * `THEFUCK_NUM_CLOSE_MATCHES` &ndash; the maximum number of close matches to suggest, like `5`.
 * `THEFUCK_EXCLUDED_SEARCH_PATH_PREFIXES` &ndash; path prefixes to ignore when searching for commands, by default `[]`.
+* `THEFUCK_AI_ENABLED` &ndash; enable AI suggestions, `true/false`;
+* `THEFUCK_AI_URL` &ndash; AI endpoint URL;
+* `THEFUCK_AI_TOKEN` &ndash; AI token (bearer);
+* `THEFUCK_AI_MODEL` &ndash; AI model name;
+* `THEFUCK_AI_TIMEOUT` &ndash; AI timeout in seconds;
+* `THEFUCK_AI_REASONING_EFFORT` &ndash; `low`, `medium`, or `high`;
+* `THEFUCK_AI_STREAM` &ndash; use SSE streaming, `true/false`;
+* `THEFUCK_AI_STREAM_OUTPUT` &ndash; stream AI output while waiting, `true/false`;
+* `THEFUCK_AI_MODE` &ndash; `prefer` or `fallback`.
 
 For example:
 
@@ -498,6 +545,13 @@ export THEFUCK_NO_COLORS='false'
 export THEFUCK_PRIORITY='no_command=9999:apt_get=100'
 export THEFUCK_HISTORY_LIMIT='2000'
 export THEFUCK_NUM_CLOSE_MATCHES='5'
+export THEFUCK_AI_ENABLED='true'
+export THEFUCK_AI_URL='http://127.0.0.1:8000/v1/chat/completions'
+export THEFUCK_AI_TOKEN='devtoken'
+export THEFUCK_AI_MODEL='gpt-5.2'
+export THEFUCK_AI_STREAM='true'
+export THEFUCK_AI_STREAM_OUTPUT='true'
+export THEFUCK_AI_MODE='prefer'
 ```
 
 ##### [Back to Contents](#contents)

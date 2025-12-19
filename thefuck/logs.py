@@ -48,21 +48,27 @@ def failed(msg):
 
 
 def show_corrected_command(corrected_command):
+    desc = getattr(corrected_command, 'desc', '') or ''
+    if desc:
+        desc = u' — {}'.format(u' '.join(desc.split()))
     sys.stderr.write(u'{prefix}{bold}{script}{reset}{side_effect}\n'.format(
         prefix=const.USER_COMMAND_MARK,
-        script=corrected_command.script,
+        script=corrected_command.script + desc,
         side_effect=u' (+side effect)' if corrected_command.side_effect else u'',
         bold=color(colorama.Style.BRIGHT),
         reset=color(colorama.Style.RESET_ALL)))
 
 
 def confirm_text(corrected_command):
+    desc = getattr(corrected_command, 'desc', '') or ''
+    if desc:
+        desc = u' — {}'.format(u' '.join(desc.split()))
     sys.stderr.write(
         (u'{prefix}{clear}{bold}{script}{reset}{side_effect} '
          u'[{green}enter{reset}/{blue}↑{reset}/{blue}↓{reset}'
-         u'/{red}ctrl+c{reset}]').format(
+         u'/{blue}tab{reset}/{red}ctrl+c{reset}]').format(
             prefix=const.USER_COMMAND_MARK,
-            script=corrected_command.script,
+            script=corrected_command.script + desc,
             side_effect=' (+side effect)' if corrected_command.side_effect else '',
             clear='\033[1K\r',
             bold=color(colorama.Style.BRIGHT),

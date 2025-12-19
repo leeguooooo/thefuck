@@ -20,11 +20,13 @@ class Bash(Generic):
                 export TF_ALIAS={name};
                 export TF_SHELL_ALIASES=$(alias);
                 export TF_HISTORY=$(fc -ln -10);
+                export TF_PROMPT="$*";
                 export PYTHONIOENCODING=utf-8;
                 TF_CMD=$(
                     thefuck {argument_placeholder} "$@"
                 ) && eval "$TF_CMD";
                 unset TF_HISTORY;
+                unset TF_PROMPT;
                 export PYTHONIOENCODING=$TF_PYTHONIOENCODING;
                 {alter_history}
             }}

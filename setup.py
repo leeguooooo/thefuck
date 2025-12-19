@@ -33,7 +33,7 @@ elif (3, 0) < version < (3, 5):
 
 VERSION = '3.32'
 
-install_requires = ['psutil', 'colorama', 'six']
+install_requires = ['psutil', 'colorama', 'six', 'rich; python_version>="3.8"']
 extras_require = {':python_version<"3.4"': ['pathlib2'],
                   ':python_version<"3.3"': ['backports.shutil_get_terminal_size'],
                   ':python_version<="2.7"': ['decorator<5', 'pyte<0.8.1'],

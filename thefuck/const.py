@@ -14,10 +14,12 @@ KEY_DOWN = _GenConst('↓')
 KEY_CTRL_C = _GenConst('Ctrl+C')
 KEY_CTRL_N = _GenConst('Ctrl+N')
 KEY_CTRL_P = _GenConst('Ctrl+P')
+KEY_TAB = _GenConst('Tab')
 
 KEY_MAPPING = {'\x0e': KEY_CTRL_N,
                '\x03': KEY_CTRL_C,
-               '\x10': KEY_CTRL_P}
+               '\x10': KEY_CTRL_P,
+               '\t': KEY_TAB}
 
 ACTION_SELECT = _GenConst('select')
 ACTION_ABORT = _GenConst('abort')
@@ -44,7 +46,16 @@ DEFAULT_SETTINGS = {'rules': DEFAULT_RULES,
                     'instant_mode': False,
                     'num_close_matches': 3,
                     'env': {'LC_ALL': 'C', 'LANG': 'C', 'GIT_TRACE': '1'},
-                    'excluded_search_path_prefixes': []}
+                    'excluded_search_path_prefixes': [],
+                    'ai_enabled': True,
+                    'ai_url': 'http://127.0.0.1:8000/v1/chat/completions',
+                    'ai_token': 'devtoken',
+                    'ai_model': 'gpt-5.2',
+                    'ai_timeout': 5,
+                    'ai_reasoning_effort': 'low',
+                    'ai_stream': True,
+                    'ai_mode': 'prefer',
+                    'ai_stream_output': True}
 
 ENV_TO_ATTR = {'THEFUCK_RULES': 'rules',
                'THEFUCK_EXCLUDE_RULES': 'exclude_rules',
@@ -60,7 +71,16 @@ ENV_TO_ATTR = {'THEFUCK_RULES': 'rules',
                'THEFUCK_REPEAT': 'repeat',
                'THEFUCK_INSTANT_MODE': 'instant_mode',
                'THEFUCK_NUM_CLOSE_MATCHES': 'num_close_matches',
-               'THEFUCK_EXCLUDED_SEARCH_PATH_PREFIXES': 'excluded_search_path_prefixes'}
+               'THEFUCK_EXCLUDED_SEARCH_PATH_PREFIXES': 'excluded_search_path_prefixes',
+               'THEFUCK_AI_ENABLED': 'ai_enabled',
+               'THEFUCK_AI_URL': 'ai_url',
+               'THEFUCK_AI_TOKEN': 'ai_token',
+               'THEFUCK_AI_MODEL': 'ai_model',
+               'THEFUCK_AI_TIMEOUT': 'ai_timeout',
+               'THEFUCK_AI_REASONING_EFFORT': 'ai_reasoning_effort',
+               'THEFUCK_AI_STREAM': 'ai_stream',
+               'THEFUCK_AI_MODE': 'ai_mode',
+               'THEFUCK_AI_STREAM_OUTPUT': 'ai_stream_output'}
 
 SETTINGS_HEADER = u"""# The Fuck settings file
 #
