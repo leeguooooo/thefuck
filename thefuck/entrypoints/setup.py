@@ -3,11 +3,17 @@ import sys
 import shutil
 from getpass import getpass
 import six
-from six.moves import input
 from ..conf import settings
 from ..logs import warn
 from ..shells import shell
 from ..system import Path
+
+# Use builtin input to avoid colorama wrapper issues
+if six.PY2:
+    _input = raw_input  # noqa: F821
+else:
+    import builtins
+    _input = builtins.input
 
 
 def _ask(prompt, default=None, secret=False):
@@ -18,7 +24,7 @@ def _ask(prompt, default=None, secret=False):
     if secret:
         value = getpass(prompt_text)
     else:
-        value = input(prompt_text)
+        value = _input(prompt_text)
     value = value.strip()
     if not value:
         return default
@@ -28,7 +34,7 @@ def _ask(prompt, default=None, secret=False):
 def _ask_bool(prompt, default):
     suffix = 'Y/n' if default else 'y/N'
     while True:
-        value = input('{} ({})? '.format(prompt, suffix)).strip().lower()
+        value = _input('{} ({})? '.format(prompt, suffix)).strip().lower()
         if not value:
             return default
         if value in ('y', 'yes'):
