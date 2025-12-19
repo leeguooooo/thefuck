@@ -17,7 +17,6 @@ from ..shells import shell  # noqa: E402
 from ..conf import settings  # noqa: E402
 from ..system import Path  # noqa: E402
 from ..corrector import get_corrected_commands  # noqa: E402
-from ..ui import select_command  # noqa: E402
 from ..exceptions import EmptyCommand  # noqa: E402
 
 
@@ -116,28 +115,29 @@ def _run_and_fix_command(command_script):
         return False
 
     corrected_commands = get_corrected_commands(command)
-    selected_command = select_command(corrected_commands)
-
+    
+    # Get the first corrected command
+    selected_command = None
+    for cmd in corrected_commands:
+        selected_command = cmd
+        break
+    
     if selected_command:
         # Print the fixed command
         fixed_script = selected_command.script
-        logs.show_corrected_command(fixed_script)
+        print(u'\nSuggested fix: {}'.format(fixed_script))
         
-        # Ask for confirmation or run directly based on settings
-        if not settings.require_confirmation:
-            # Run the fixed command
-            subprocess.call(fixed_script, shell=True)
-        else:
-            # Show the command and ask user to confirm
-            try:
-                if six.PY2:
-                    response = raw_input('Run this command? [Y/n] ')  # noqa: F821
-                else:
-                    response = input('Run this command? [Y/n] ')
-                if response.lower() in ('', 'y', 'yes'):
-                    subprocess.call(fixed_script, shell=True)
-            except (KeyboardInterrupt, EOFError):
-                print('')
+        # Ask for confirmation
+        try:
+            if six.PY2:
+                response = raw_input('Run this command? [Y/n] ')  # noqa: F821
+            else:
+                response = input('Run this command? [Y/n] ')
+            if response.lower() in ('', 'y', 'yes'):
+                subprocess.call(fixed_script, shell=True)
+                return True
+        except (KeyboardInterrupt, EOFError):
+            print('')
         return True
     return False
 

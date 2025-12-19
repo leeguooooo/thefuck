@@ -31,7 +31,7 @@ elif (3, 0) < version < (3, 5):
           ' ({}.{} detected).'.format(*version))
     sys.exit(-1)
 
-VERSION = '3.33'
+VERSION = '3.34'
 
 install_requires = ['psutil', 'colorama', 'six', 'rich; python_version>="3.8"']
 extras_require = {':python_version<"3.4"': ['pathlib2'],

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "thefuck-leeguoo"
-version = "3.33"
+version = "3.34"
 description = "Magnificent app which corrects your previous console command"
 readme = "README.md"
 requires-python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
