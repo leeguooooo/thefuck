@@ -1,8 +1,8 @@
 # thefuck-leeguoo
 
-AI-first command fixer for your shell with streamed explanations and Markdown rendering.
+AI-first command fixer for your shell/terminal CLI (bash, zsh, fish) with streamed explanations and Markdown rendering.
 
-<img width="898" height="323" alt="CleanShot 2025-12-23 at 16 49 40" src="https://github.com/user-attachments/assets/5b90cb3a-364c-4a72-ace2-4af872b6cbf2" />
+<img width="898" height="323" alt="AI shell command fixer screenshot" src="https://github.com/user-attachments/assets/5b90cb3a-364c-4a72-ace2-4af872b6cbf2" />
 
 ## English
 

@@ -31,7 +31,7 @@ elif (3, 0) < version < (3, 5):
           ' ({}.{} detected).'.format(*version))
     sys.exit(-1)
 
-VERSION = '3.43'
+VERSION = '3.44'
 
 install_requires = ['psutil', 'colorama', 'six', 'rich; python_version>="3.8"']
 extras_require = {':python_version<"3.4"': ['pathlib2'],
@@ -53,12 +53,19 @@ else:
 
 setup(name='thefuck-leeguoo',
       version=VERSION,
-      description="Magnificent app which corrects your previous console command",
+      description="AI-first command fixer for shell/terminal CLI with streamed explanations and Markdown rendering",
       long_description=long_description,
-      author='Vladimir Iakovlev',
-      author_email='nvbn.rm@gmail.com',
-      url='https://github.com/nvbn/thefuck',
+      author='leeguoo',
+      author_email='leeguoo@users.noreply.github.com',
+      url='https://github.com/leeguooooo/thefuck',
       license='MIT',
+      keywords='ai, cli, command line, shell, terminal, autocorrect, bash, zsh, fish, productivity',
+      project_urls={
+          'Homepage': 'https://github.com/leeguooooo/thefuck',
+          'Repository': 'https://github.com/leeguooooo/thefuck',
+          'Issues': 'https://github.com/leeguooooo/thefuck/issues',
+          'Documentation': 'https://github.com/leeguooooo/thefuck#readme',
+      },
       packages=find_packages(exclude=['ez_setup', 'examples',
                                       'tests', 'tests.*', 'release']),
       include_package_data=True,
