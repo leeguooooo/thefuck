@@ -43,8 +43,29 @@ think: The command gti is a typo for git.
 answer: {"primary": {"command": "git status", "desc": "Show repository status"}, "alternatives": []}"""
 
 
+_CJK_RE = re.compile(
+    u'[\u4e00-\u9fff\u3400-\u4dbf\u3040-\u30ff\uac00-\ud7af]')
+
+
 def is_enabled():
     return bool(settings.ai_enabled and settings.ai_url)
+
+
+def _has_cjk(text):
+    if not text:
+        return False
+    return bool(_CJK_RE.search(six.text_type(text)))
+
+
+def _language_instruction(command, prompt):
+    samples = [
+        getattr(command, 'script', None),
+        getattr(command, 'output', None),
+        prompt,
+    ]
+    if any(_has_cjk(sample) for sample in samples if sample):
+        return 'Respond in Chinese.'
+    return 'Respond in English.'
 
 
 def _build_ai_theme():
@@ -235,6 +256,9 @@ def get_ai_suggestion(command, prompt=None, warn_on_error=False):
 
 def _build_payload(command, prompt):
     output = six.text_type(command.output or '')
+    system_prompt = SYSTEM_PROMPT
+    system_prompt += '\n\nLanguage:\n{}'.format(
+        _language_instruction(command, prompt))
     user_lines = [
         'Failed command:',
         six.text_type(command.script or ''),
@@ -248,7 +272,7 @@ def _build_payload(command, prompt):
     payload = {
         'model': settings.ai_model,
         'messages': [
-            {'role': 'system', 'content': SYSTEM_PROMPT},
+            {'role': 'system', 'content': system_prompt},
             {'role': 'user', 'content': '\n'.join(user_lines)}
         ],
         'stream': bool(settings.ai_stream)
