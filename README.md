@@ -7,7 +7,8 @@ that corrects errors in previous console commands.
 
 Is *The Fuck* too slow? [Try the experimental instant mode!](#experimental-instant-mode)
 
-[![gif with examples][examples-link]][examples-link]
+<img width="898" height="323" alt="CleanShot 2025-12-23 at 16 49 40" src="https://github.com/user-attachments/assets/5b90cb3a-364c-4a72-ace2-4af872b6cbf2" />
+
 
 More examples:
 
