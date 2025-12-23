@@ -316,6 +316,7 @@ class _StreamWriter(object):
         self._live = None
         self._markdown_cls = None
         self._use_rich = False
+        self._transient = False
         self._init_rich()
 
     def _init_rich(self):
@@ -326,9 +327,10 @@ class _StreamWriter(object):
         except Exception:
             return
         self._use_rich = True
+        self._transient = True
         self._console = Console(stderr=True, theme=_build_ai_theme())
         self._live = Live(Markdown(''), console=self._console,
-                          refresh_per_second=8)
+                          refresh_per_second=8, transient=True)
         self._markdown_cls = Markdown
 
     def feed(self, chunk):
@@ -383,7 +385,7 @@ class _StreamWriter(object):
         if self._started:
             return
         self._started = True
-        self.streamed = True
+        self.streamed = not self._transient
         if self._use_rich:
             self._console.print('AI:', style='ai.label')
             self._live.start()

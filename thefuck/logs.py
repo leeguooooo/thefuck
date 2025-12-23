@@ -2,8 +2,10 @@
 
 from contextlib import contextmanager
 from datetime import datetime
+import os
 import re
 import sys
+import unicodedata
 from traceback import format_exception
 import colorama
 try:
@@ -30,12 +32,38 @@ def _strip_ansi(text):
     return _ANSI_RE.sub('', text)
 
 
+def _terminal_columns():
+    try:
+        return os.get_terminal_size(sys.stderr.fileno()).columns or 80
+    except Exception:
+        cols = get_terminal_size((80, 20)).columns or 80
+        return cols
+
+
+def _text_width(text):
+    width = 0
+    for ch in text:
+        if unicodedata.combining(ch):
+            continue
+        if unicodedata.east_asian_width(ch) in ('W', 'F'):
+            width += 2
+        else:
+            width += 1
+    return width
+
+
 def _calc_prompt_lines(text):
-    cols = get_terminal_size((80, 20)).columns or 80
+    cols = _terminal_columns()
     if cols <= 0:
         cols = 80
     visible = _strip_ansi(text.replace(const.USER_COMMAND_MARK, ''))
-    return max(1, (len(visible) - 1) // cols + 1)
+    if not visible:
+        return 1
+    total = 0
+    for line in visible.splitlines() or ['']:
+        width = _text_width(line)
+        total += max(1, (width - 1) // cols + 1)
+    return total
 
 
 def _clear_previous_confirm():

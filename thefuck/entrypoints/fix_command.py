@@ -42,6 +42,13 @@ def _get_ai_prompt(known_args):
     return prompt or None
 
 
+def _emit_ai_if_needed(ai_result):
+    if ai_result and ai_result.explanation and not ai_result.streamed:
+        emit_ai_result(ai_result)
+        return ai_result._replace(streamed=True)
+    return ai_result
+
+
 def fix_command(known_args):
     """Fixes previous command. Used when `thefuck` called without arguments."""
     settings.init(known_args)
@@ -62,31 +69,27 @@ def fix_command(known_args):
                 ai_result = get_ai_suggestion(
                     command, prompt=ai_prompt, warn_on_error=True)
                 if ai_result:
-                    if ai_result.explanation and not ai_result.streamed:
-                        emit_ai_result(ai_result)
-                        ai_result = ai_result._replace(streamed=True)
+                    ai_result = _emit_ai_if_needed(ai_result)
                     if ai_result.commands:
                         corrected_commands = iter(
                             build_corrected_commands(ai_result))
-                    elif ai_result.explanation and not ai_result.streamed:
-                        emit_ai_result(ai_result)
+                    elif ai_result.explanation:
                         sys.exit(1)
                     else:
                         sys.exit(1)
             elif settings.ai_mode == 'prefer':
                 ai_result = get_ai_suggestion(command)
                 if ai_result:
+                    ai_result = _emit_ai_if_needed(ai_result)
                     if ai_result.commands:
                         ai_commands = build_corrected_commands(ai_result)
                         corrected_commands = chain(ai_commands,
                                                    corrected_commands)
-                    elif ai_result.explanation:
-                        emit_ai_result(ai_result)
             else:
                 corrected_commands, ai_result = fallback_corrected_commands(
                     command, corrected_commands)
+                ai_result = _emit_ai_if_needed(ai_result)
                 if ai_result and not ai_result.commands and ai_result.explanation:
-                    emit_ai_result(ai_result)
                     sys.exit(1)
         selected_command = select_command(corrected_commands)
 
