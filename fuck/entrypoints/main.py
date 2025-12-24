@@ -7,7 +7,8 @@ import os  # noqa: E402
 import sys  # noqa: E402
 from .. import logs  # noqa: E402
 from ..argument_parser import Parser  # noqa: E402
-from ..utils import get_installation_version  # noqa: E402
+from ..utils import get_installation_version, should_refresh_alias  # noqa: E402
+from .. import const  # noqa: E402
 from ..shells import shell  # noqa: E402
 from .alias import print_alias  # noqa: E402
 from .fix_command import fix_command  # noqa: E402
@@ -28,9 +29,23 @@ def _called_via_alias():
                 os.environ.get('FUCK_HISTORY'))
 
 
+def _refresh_alias_and_retry(argv):
+    args = [arg for arg in argv if arg != const.ARGUMENT_PLACEHOLDER]
+    quoted = ' '.join(shell.quote(arg) for arg in args)
+    refresh_cmd = shell.alias_refresh_command()
+    if quoted:
+        print(u'{}; fuck {}'.format(refresh_cmd, quoted))
+    else:
+        print(u'{}; fuck'.format(refresh_cmd))
+
+
 def main():
     parser = Parser()
     known_args = parser.parse(sys.argv)
+
+    if _called_via_alias() and should_refresh_alias():
+        _refresh_alias_and_retry(sys.argv[1:])
+        return
 
     if known_args.help:
         parser.print_help()

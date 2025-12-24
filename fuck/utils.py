@@ -363,6 +363,23 @@ def format_shell_path(path, xdg_config_home=None, use_xdg=None):
     return str(path)
 
 
+def should_refresh_alias():
+    if not (os.environ.get('FUCK_PROMPT') or
+            os.environ.get('FUCK_COMMAND') or
+            os.environ.get('FUCK_HISTORY')):
+        return False
+
+    current_version = get_installation_version()
+    if not current_version or current_version == 'unknown':
+        return False
+
+    alias_version = os.environ.get('FUCK_ALIAS_VERSION')
+    if not alias_version:
+        return True
+
+    return alias_version != current_version
+
+
 @memoize
 def get_valid_history_without_current(command):
     def _not_corrected(history, alias):

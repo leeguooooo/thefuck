@@ -5,25 +5,8 @@ from .shells import shell
 from .conf import settings, load_source
 from .const import DEFAULT_PRIORITY, ALL_ENABLED
 from .exceptions import EmptyCommand
-from .utils import get_alias, format_raw_script, get_installation_version
+from .utils import get_alias, format_raw_script, should_refresh_alias
 from .output_readers import get_output
-
-
-def _should_refresh_alias():
-    if not (os.environ.get('FUCK_PROMPT') or
-            os.environ.get('FUCK_COMMAND') or
-            os.environ.get('FUCK_HISTORY')):
-        return False
-
-    current_version = get_installation_version()
-    if not current_version or current_version == 'unknown':
-        return False
-
-    alias_version = os.environ.get('FUCK_ALIAS_VERSION')
-    if not alias_version:
-        return True
-
-    return alias_version != current_version
 
 
 class Command(object):
@@ -261,7 +244,7 @@ class CorrectedCommand(object):
         else:
             script = self.script
 
-        if _should_refresh_alias():
+        if should_refresh_alias():
             refresh_cmd = shell.alias_refresh_command()
             return u'{}; {}'.format(refresh_cmd, script)
         return script
