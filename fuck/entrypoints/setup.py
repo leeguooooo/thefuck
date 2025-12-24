@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import shutil
 from getpass import getpass
@@ -79,6 +80,61 @@ def _build_env_lines(values, fish):
         else:
             lines.append('export {}={}'.format(key, _quote(value)))
     return lines
+
+
+def _format_setting_value(value):
+    if isinstance(value, six.binary_type):
+        value = value.decode('utf-8')
+    if isinstance(value, six.text_type):
+        return repr(value)
+    return repr(value)
+
+
+def _update_settings_file(path, values, order):
+    try:
+        with path.open(mode='r') as settings_file:
+            lines = settings_file.readlines()
+    except OSError as exc:
+        warn('Failed to read settings file {}: {}'.format(path, exc))
+        return False
+
+    patterns = {
+        key: re.compile(r'^\s*{}\s*='.format(re.escape(key)))
+        for key in values.keys()
+    }
+    updated = set()
+    new_lines = []
+    for line in lines:
+        if line.lstrip().startswith('#'):
+            new_lines.append(line)
+            continue
+        replaced = False
+        for key, pattern in patterns.items():
+            if pattern.match(line):
+                new_lines.append(u'{} = {}\n'.format(
+                    key, _format_setting_value(values[key])))
+                updated.add(key)
+                replaced = True
+                break
+        if not replaced:
+            new_lines.append(line)
+
+    missing = [key for key in order if key in values and key not in updated]
+    if missing:
+        if new_lines and new_lines[-1].strip():
+            new_lines.append('\n')
+        new_lines.append('# Values set by fuck setup\n')
+        for key in missing:
+            new_lines.append(u'{} = {}\n'.format(
+                key, _format_setting_value(values[key])))
+
+    try:
+        with path.open(mode='w') as settings_file:
+            settings_file.writelines(new_lines)
+    except OSError as exc:
+        warn('Failed to write settings file {}: {}'.format(path, exc))
+        return False
+    return True
 
 
 def _write_env_file(path, lines):
@@ -174,6 +230,8 @@ def setup():
     values = {
         'FUCK_AI_ENABLED': 'true' if ai_enabled else 'false'
     }
+    settings_order = ['ai_enabled']
+    settings_values = {'ai_enabled': ai_enabled}
 
     if ai_enabled:
         ai_url = _ask('AI URL', defaults['ai_url'])
@@ -200,6 +258,27 @@ def setup():
             'FUCK_AI_MODE': ai_mode,
             'FUCK_AI_STREAM_OUTPUT': 'true' if ai_stream_output else 'false'
         })
+        settings_order = [
+            'ai_enabled',
+            'ai_url',
+            'ai_token',
+            'ai_model',
+            'ai_timeout',
+            'ai_reasoning_effort',
+            'ai_stream',
+            'ai_mode',
+            'ai_stream_output'
+        ]
+        settings_values.update({
+            'ai_url': ai_url,
+            'ai_token': ai_token,
+            'ai_model': ai_model,
+            'ai_timeout': ai_timeout,
+            'ai_reasoning_effort': ai_reasoning_effort,
+            'ai_stream': ai_stream,
+            'ai_mode': ai_mode,
+            'ai_stream_output': ai_stream_output
+        })
 
     env_lines = _build_path_lines(bin_path_shell, fish)
     env_lines.extend(_build_env_lines(values, fish))
@@ -209,6 +288,9 @@ def setup():
         env_lines.extend(alias_lines)
     _write_env_file(env_path, env_lines)
     _write_wrapper(bin_dir.joinpath('fuck'))
+    settings_path = config_root.joinpath('settings.py')
+    if _update_settings_file(settings_path, settings_values, settings_order):
+        print('Updated settings file:', settings_path)
 
     print('\nWrote env file:', env_path)
     print('Wrote wrapper:', bin_dir.joinpath('fuck'))
