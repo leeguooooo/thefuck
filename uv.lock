@@ -442,7 +442,7 @@ wheels = [
 ]
 
 [[package]]
-name = "fuck"
+name = "fuck-cli"
 version = "3.44"
 source = { editable = "." }
 dependencies = [

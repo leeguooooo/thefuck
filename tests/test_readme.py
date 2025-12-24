@@ -3,7 +3,7 @@ def test_readme(source_root):
         readme = f.read()
 
         assert '# fuck' in readme
-        assert 'uv tool install fuck' in readme
+        assert 'uv tool install fuck-cli' in readme
         assert 'fuck setup' in readme
         assert 'Disclaimer:' in readme
         assert '免责声明' in readme

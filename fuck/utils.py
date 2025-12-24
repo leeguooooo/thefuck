@@ -302,7 +302,7 @@ def get_installation_version():
         except Exception:
             return
 
-        for name in ('fuck',):
+        for name in ('fuck', 'fuck-cli'):
             try:
                 return version(name)
             except PackageNotFoundError:
@@ -329,10 +329,12 @@ def get_installation_version():
     except Exception:
         return 'unknown'
 
-    try:
-        return pkg_resources.require('fuck')[0].version
-    except Exception:
-        return 'unknown'
+    for name in ('fuck', 'fuck-cli'):
+        try:
+            return pkg_resources.require(name)[0].version
+        except Exception:
+            continue
+    return 'unknown'
 
 
 def get_alias():

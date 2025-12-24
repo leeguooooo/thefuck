@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel", "fastentrypoints"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "fuck"
+name = "fuck-cli"
 version = "3.44"
 description = "AI-first command fixer for shell/terminal CLI with streamed explanations and Markdown rendering"
 readme = "README.md"

@@ -47,7 +47,7 @@ else:
 entry_points = {'console_scripts': [
               'fuck = fuck.entrypoints.main:main']}
 
-setup(name='fuck',
+setup(name='fuck-cli',
       version=VERSION,
       description="AI-first command fixer for shell/terminal CLI with streamed explanations and Markdown rendering",
       long_description=long_description,

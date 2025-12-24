@@ -9,9 +9,9 @@ AI-first command fixer for your shell/terminal CLI (bash, zsh, fish) with stream
 Install:
 
 ```bash
-uv tool install fuck
+uv tool install fuck-cli
 # or
-pip install fuck
+pip install fuck-cli
 ```
 
 Setup (recommended):
@@ -39,9 +39,9 @@ Disclaimer: always review the suggested command before executing it.
 安装：
 
 ```bash
-uv tool install fuck
+uv tool install fuck-cli
 # 或
-pip install fuck
+pip install fuck-cli
 ```
 
 初始化（推荐）：
@@ -69,9 +69,9 @@ AI 配置：运行 `fuck setup`，或设置环境变量如 `FUCK_AI_URL`、
 インストール：
 
 ```bash
-uv tool install fuck
+uv tool install fuck-cli
 # または
-pip install fuck
+pip install fuck-cli
 ```
 
 セットアップ（推奨）：
