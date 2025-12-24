@@ -86,10 +86,21 @@ class Zsh(Generic):
             return ''
 
     def how_to_configure(self):
+        candidates = []
+        zdotdir = os.environ.get('ZDOTDIR')
+        if zdotdir:
+            candidates.append(
+                os.path.join(os.path.expanduser(zdotdir), '.zshrc'))
+        candidates.extend(['~/.zshrc', '~/.zprofile', '~/.zshenv'])
+        config = next(
+            (path for path in candidates
+             if os.path.isfile(os.path.expanduser(path))),
+            candidates[0])
+
         return self._create_shell_configuration(
-            content=u'eval $(fuck --alias)',
-            path='~/.zshrc',
-            reload='source ~/.zshrc')
+            content=self._env_source(),
+            path=config,
+            reload='source {}'.format(config))
 
     def _get_version(self):
         """Returns the version of the current shell"""

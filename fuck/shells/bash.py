@@ -75,15 +75,14 @@ class Bash(Generic):
         return u'{}\n'.format(command_script)
 
     def how_to_configure(self):
-        if os.path.join(os.path.expanduser('~'), '.bashrc'):
-            config = '~/.bashrc'
-        elif os.path.join(os.path.expanduser('~'), '.bash_profile'):
-            config = '~/.bash_profile'
-        else:
-            config = 'bash config'
+        candidates = ['~/.bashrc', '~/.bash_profile', '~/.profile']
+        config = next(
+            (path for path in candidates
+             if os.path.isfile(os.path.expanduser(path))),
+            candidates[0])
 
         return self._create_shell_configuration(
-            content=u'eval "$(fuck --alias)"',
+            content=self._env_source(),
             path=config,
             reload=u'source {}'.format(config))
 

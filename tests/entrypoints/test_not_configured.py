@@ -54,7 +54,7 @@ def shell(mocker):
                          new_callable=MagicMock)
     shell.get_history.return_value = []
     shell.how_to_configure.return_value = ShellConfiguration(
-        content='eval $(fuck --alias)',
+        content='source $HOME/.config/fuck/env.sh',
         path='/tmp/.bashrc',
         reload='bash',
         can_configure_automatically=True)
@@ -111,7 +111,7 @@ def test_on_first_run_from_current_shell(usage_tracker_io, shell_pid,
 def test_when_cant_configure_automatically(shell_pid, shell, logs):
     shell_pid.return_value = 12
     shell.how_to_configure.return_value = ShellConfiguration(
-        content='eval $(fuck --alias)',
+        content='source $HOME/.config/fuck/env.sh',
         path='/tmp/.bashrc',
         reload='bash',
         can_configure_automatically=False)
@@ -124,7 +124,7 @@ def test_when_already_configured(usage_tracker_io, shell_pid,
     shell.get_history.return_value = ['fuck']
     shell_pid.return_value = 12
     _change_tracker(usage_tracker_io, 12)
-    shell_config.read.return_value = 'eval $(fuck --alias)'
+    shell_config.read.return_value = 'source $HOME/.config/fuck/env.sh'
     main()
     logs.already_configured.assert_called_once()
 
@@ -136,5 +136,5 @@ def test_when_successfully_configured(usage_tracker_io, shell_pid,
     _change_tracker(usage_tracker_io, 12)
     shell_config.read.return_value = ''
     main()
-    shell_config.write.assert_any_call('eval $(fuck --alias)')
+    shell_config.write.assert_any_call('source $HOME/.config/fuck/env.sh')
     logs.configured_successfully.assert_called_once()

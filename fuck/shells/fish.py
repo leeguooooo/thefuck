@@ -102,10 +102,13 @@ class Fish(Generic):
         return u'; or '.join(commands)
 
     def how_to_configure(self):
+        xdg_config_home = os.environ.get('XDG_CONFIG_HOME', '~/.config')
+        config_path = os.path.join(
+            os.path.expanduser(xdg_config_home), 'fish', 'config.fish')
         return self._create_shell_configuration(
-            content=u"fuck --alias | source",
-            path='~/.config/fish/config.fish',
-            reload='fish')
+            content=self._env_source(fish=True),
+            path=config_path,
+            reload='source {}'.format(config_path))
 
     def _get_version(self):
         """Returns the version of the current shell"""

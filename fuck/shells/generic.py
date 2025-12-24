@@ -4,7 +4,7 @@ import shlex
 import six
 from collections import namedtuple
 from ..logs import warn
-from ..utils import memoize
+from ..utils import memoize, format_shell_path
 from ..conf import settings
 from ..system import Path
 
@@ -109,6 +109,15 @@ class Generic(object):
             from shlex import quote
 
         return quote(s)
+
+    def _env_path(self, fish=False):
+        xdg_config_home = os.environ.get('XDG_CONFIG_HOME', '~/.config')
+        filename = 'env.fish' if fish else 'env.sh'
+        env_path = Path(xdg_config_home, 'fuck', filename).expanduser()
+        return format_shell_path(env_path)
+
+    def _env_source(self, fish=False):
+        return u'source {}'.format(self._env_path(fish))
 
     def _script_from_history(self, line):
         return line

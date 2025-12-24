@@ -341,6 +341,28 @@ def get_alias():
     return os.environ.get('FUCK_ALIAS', 'fuck')
 
 
+def format_shell_path(path, xdg_config_home=None, use_xdg=None):
+    path = Path(path).expanduser()
+    xdg_config_home = (xdg_config_home if xdg_config_home is not None
+                       else os.environ.get('XDG_CONFIG_HOME'))
+    use_xdg = use_xdg if use_xdg is not None else xdg_config_home is not None
+
+    if use_xdg and xdg_config_home:
+        xdg_root = Path(xdg_config_home, 'fuck').expanduser()
+        if path == xdg_root:
+            return '$XDG_CONFIG_HOME/fuck'
+        if str(path).startswith(str(xdg_root) + os.sep):
+            suffix = str(path)[len(str(xdg_root)) + 1:]
+            return '$XDG_CONFIG_HOME/fuck/{}'.format(suffix)
+
+    home = Path('~').expanduser()
+    if str(path).startswith(str(home) + os.sep):
+        suffix = str(path)[len(str(home)) + 1:]
+        return '$HOME/{}'.format(suffix)
+
+    return str(path)
+
+
 @memoize
 def get_valid_history_without_current(command):
     def _not_corrected(history, alias):

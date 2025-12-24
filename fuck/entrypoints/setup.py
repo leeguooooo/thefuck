@@ -7,6 +7,7 @@ from ..conf import settings
 from ..logs import warn
 from ..shells import shell
 from ..system import Path
+from ..utils import format_shell_path, get_alias
 
 # Use builtin input to avoid colorama wrapper issues
 if six.PY2:
@@ -80,21 +81,6 @@ def _build_env_lines(values, fish):
     return lines
 
 
-def _shell_path(path, xdg_config_home, use_xdg):
-    if use_xdg and xdg_config_home:
-        xdg_root = Path(xdg_config_home, 'fuck').expanduser()
-        if path == xdg_root:
-            return '$XDG_CONFIG_HOME/fuck'
-        if str(path).startswith(str(xdg_root) + os.sep):
-            suffix = str(path)[len(str(xdg_root)) + 1:]
-            return '$XDG_CONFIG_HOME/fuck/{}'.format(suffix)
-    home = Path('~').expanduser()
-    if str(path).startswith(str(home) + os.sep):
-        suffix = str(path)[len(str(home)) + 1:]
-        return '$HOME/{}'.format(suffix)
-    return str(path)
-
-
 def _write_env_file(path, lines):
     with path.open(mode='w') as env_file:
         env_file.write('# fuck env\n')
@@ -124,6 +110,19 @@ def _write_wrapper(path):
     os.chmod(str(path), 0o755)
 
 
+def _build_alias_lines(alias_name):
+    alias = shell.app_alias(alias_name)
+    if not alias:
+        return []
+    return [line.rstrip() for line in alias.strip('\n').splitlines()]
+
+
+def _reload_command(path):
+    if shell.__class__.__name__.lower() == 'powershell':
+        return '. {}'.format(path)
+    return 'source {}'.format(path)
+
+
 def setup():
     print('Setup:')
     print('Press enter to keep the default value shown in brackets.')
@@ -150,8 +149,8 @@ def setup():
     bin_dir = config_root.joinpath('bin')
     fish = _is_fish()
     env_path = config_root.joinpath('env.fish' if fish else 'env.sh')
-    env_path_shell = _shell_path(env_path, xdg_config_home, use_xdg)
-    bin_path_shell = _shell_path(bin_dir, xdg_config_home, use_xdg)
+    env_path_shell = format_shell_path(env_path, xdg_config_home, use_xdg)
+    bin_path_shell = format_shell_path(bin_dir, xdg_config_home, use_xdg)
 
     if not config_root.is_dir():
         config_root.mkdir(parents=True)
@@ -204,24 +203,32 @@ def setup():
 
     env_lines = _build_path_lines(bin_path_shell, fish)
     env_lines.extend(_build_env_lines(values, fish))
+    alias_lines = _build_alias_lines(get_alias())
+    if alias_lines:
+        env_lines.append('')
+        env_lines.extend(alias_lines)
     _write_env_file(env_path, env_lines)
     _write_wrapper(bin_dir.joinpath('fuck'))
 
     print('\nWrote env file:', env_path)
     print('Wrote wrapper:', bin_dir.joinpath('fuck'))
     print('\nAdd to your shell config:')
-    print('source {}'.format(env_path_shell))
+    configuration_details = shell.how_to_configure()
+    if configuration_details:
+        print(configuration_details.content)
+    else:
+        print('source {}'.format(env_path_shell))
     print('\nOptional for local development:')
     print('set FUCK_PROJECT_PATH to use a local checkout with uv run')
 
-    config = shell.how_to_configure()
-    if config and _ask_bool(
-            'Append setup to {}'.format(config.path), False):
-        path = os.path.expanduser(config.path)
+    if configuration_details and _ask_bool(
+            'Append setup to {}'.format(configuration_details.path), False):
+        target_path = _ask('Shell config file', configuration_details.path)
+        path = os.path.expanduser(target_path)
         try:
             with open(path, 'a') as config_file:
                 config_file.write('\n# fuck config\n')
-                config_file.write('source {}\n'.format(env_path_shell))
-            print('Done. Run: {}'.format(config.reload))
+                config_file.write(configuration_details.content + '\n')
+            print('Done. Run: {}'.format(_reload_command(target_path)))
         except OSError as exc:
             warn('Failed to write {}: {}'.format(path, exc))
