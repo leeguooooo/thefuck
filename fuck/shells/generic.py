@@ -4,7 +4,7 @@ import shlex
 import six
 from collections import namedtuple
 from ..logs import warn
-from ..utils import memoize, format_shell_path
+from ..utils import memoize, format_shell_path, get_installation_version
 from ..conf import settings
 from ..system import Path
 
@@ -36,8 +36,11 @@ class Generic(object):
         return command_script
 
     def app_alias(self, alias_name):
-        return """alias {0}='eval "$(FUCK_ALIAS={0} PYTHONIOENCODING=utf-8 """ \
-               """command fuck "$(fc -ln -1)")"'""".format(alias_name)
+        alias_version = get_installation_version()
+        return ("""alias {0}='eval "$(FUCK_ALIAS={0} """ \
+                """FUCK_ALIAS_VERSION={1} PYTHONIOENCODING=utf-8 """ \
+                """command fuck "$(fc -ln -1)")"'""".format(
+                    alias_name, alias_version))
 
     def instant_mode_alias(self, alias_name):
         warn("Instant mode not supported by your shell")
@@ -118,6 +121,9 @@ class Generic(object):
 
     def _env_source(self, fish=False):
         return u'source {}'.format(self._env_path(fish))
+
+    def alias_refresh_command(self):
+        return u'eval "$(command fuck --alias)"'
 
     def _script_from_history(self, line):
         return line

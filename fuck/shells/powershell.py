@@ -1,16 +1,18 @@
 from subprocess import Popen, PIPE
-from ..utils import DEVNULL
+from ..utils import DEVNULL, get_installation_version
 from .generic import Generic, ShellConfiguration
 
 
 class Powershell(Generic):
     friendly_name = 'PowerShell'
+    _alias_version = get_installation_version()
 
     def app_alias(self, alias_name):
         return 'function ' + alias_name + ' {\n' \
+               '    $env:FUCK_ALIAS_VERSION = "' + self._alias_version + '";\n' \
                '    $history = (Get-History -Count 1).CommandLine;\n' \
                '    if (-not [string]::IsNullOrWhiteSpace($history)) {\n' \
-               '        $app = Get-Command fuck -CommandType Application -ErrorAction SilentlyContinue;\n' \
+                '        $app = Get-Command fuck -CommandType Application -ErrorAction SilentlyContinue;\n' \
                '        if ($app) {\n' \
                '            $fixed = & $app.Source @args $history;\n' \
                '            if (-not [string]::IsNullOrWhiteSpace($fixed)) {\n' \
@@ -31,6 +33,11 @@ class Powershell(Generic):
             path='$profile',
             reload='. $profile',
             can_configure_automatically=False)
+
+    def alias_refresh_command(self):
+        return (u'$app = Get-Command fuck -CommandType Application '
+                u'-ErrorAction SilentlyContinue; '
+                u'if ($app) { iex "$(& $app.Source --alias)" }')
 
     def _get_version(self):
         """Returns the version of the current shell"""

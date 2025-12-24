@@ -5,12 +5,13 @@ from tempfile import gettempdir
 from uuid import uuid4
 from ..conf import settings
 from ..const import ARGUMENT_PLACEHOLDER, USER_COMMAND_MARK
-from ..utils import DEVNULL, memoize
+from ..utils import DEVNULL, memoize, get_installation_version
 from .generic import Generic
 
 
 class Zsh(Generic):
     friendly_name = 'ZSH'
+    _alias_version = get_installation_version()
 
     def app_alias(self, alias_name):
         # It is VERY important to have the variables declared WITHIN the function
@@ -25,6 +26,7 @@ class Zsh(Generic):
                 fi
                 export FUCK_SHELL=zsh;
                 export FUCK_ALIAS={name};
+                export FUCK_ALIAS_VERSION="{alias_version}";
                 FUCK_SHELL_ALIASES=$(alias);
                 export FUCK_SHELL_ALIASES;
                 FUCK_HISTORY="$(fc -ln -10)";
@@ -42,6 +44,7 @@ class Zsh(Generic):
         '''.format(
             name=alias_name,
             argument_placeholder=ARGUMENT_PLACEHOLDER,
+            alias_version=self._alias_version,
             alter_history=('test -n "$FUCK_CMD" && print -s $FUCK_CMD'
                            if settings.alter_history else ''))
 

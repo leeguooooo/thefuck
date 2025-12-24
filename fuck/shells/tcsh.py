@@ -1,17 +1,20 @@
 from subprocess import Popen, PIPE
 from time import time
 import os
-from ..utils import DEVNULL, memoize
+from ..utils import DEVNULL, memoize, get_installation_version
 from .generic import Generic
 
 
 class Tcsh(Generic):
     friendly_name = 'Tcsh'
+    _alias_version = get_installation_version()
 
     def app_alias(self, alias_name):
         return ("alias {0} 'setenv FUCK_SHELL tcsh && setenv FUCK_ALIAS {0} && "
+                "setenv FUCK_ALIAS_VERSION \"{1}\" && "
                 "set fucked_cmd=`history -h 2 | head -n 1` && "
-                "eval `\\fuck ${{fucked_cmd}}`'").format(alias_name)
+                "eval `\\fuck ${{fucked_cmd}}`'").format(
+                    alias_name, self._alias_version)
 
     def _parse_alias(self, alias):
         name, value = alias.split("\t", 1)
@@ -37,6 +40,9 @@ class Tcsh(Generic):
             content=u'eval `fuck --alias`',
             path='~/.tcshrc',
             reload='tcsh')
+
+    def alias_refresh_command(self):
+        return u'eval `\\fuck --alias`'
 
     def _get_version(self):
         """Returns the version of the current shell"""

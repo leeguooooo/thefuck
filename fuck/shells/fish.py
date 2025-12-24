@@ -6,7 +6,7 @@ import six
 from .. import logs
 from ..conf import settings
 from ..const import ARGUMENT_PLACEHOLDER
-from ..utils import DEVNULL, cache
+from ..utils import DEVNULL, cache, get_installation_version
 from .generic import Generic
 
 
@@ -39,6 +39,7 @@ def _get_aliases(overridden):
 
 class Fish(Generic):
     friendly_name = 'Fish Shell'
+    _alias_version = get_installation_version()
 
     def _get_overridden_aliases(self):
         overridden = os.environ.get('FUCK_OVERRIDDEN_ALIASES', '')
@@ -60,6 +61,7 @@ class Fish(Generic):
                 '    command fuck $argv\n'
                 '    return $status\n'
                 '  end\n'
+                '  set -gx FUCK_ALIAS_VERSION "{3}"\n'
                 '  set -l fucked_up_command $history[1]\n'
                 '  set -l fuck_prompt (string join " " -- $argv)\n'
                 '  env FUCK_SHELL=fish FUCK_ALIAS={0} PYTHONIOENCODING=utf-8'
@@ -68,7 +70,8 @@ class Fish(Generic):
                 '  if [ "$unfucked_command" != "" ]\n'
                 '    eval $unfucked_command\n{1}'
                 '  end\n'
-                'end').format(alias_name, alter_history, ARGUMENT_PLACEHOLDER)
+                'end').format(alias_name, alter_history, ARGUMENT_PLACEHOLDER,
+                              self._alias_version)
 
     def get_aliases(self):
         overridden = self._get_overridden_aliases()
@@ -113,6 +116,9 @@ class Fish(Generic):
             content=self._env_source(fish=True),
             path=config_path,
             reload='source {}'.format(config_path))
+
+    def alias_refresh_command(self):
+        return u'command fuck --alias | source'
 
     def _get_version(self):
         """Returns the version of the current shell"""

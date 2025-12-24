@@ -4,12 +4,13 @@ from tempfile import gettempdir
 from uuid import uuid4
 from ..conf import settings
 from ..const import ARGUMENT_PLACEHOLDER, USER_COMMAND_MARK
-from ..utils import DEVNULL, memoize
+from ..utils import DEVNULL, memoize, get_installation_version
 from .generic import Generic
 
 
 class Bash(Generic):
     friendly_name = 'Bash'
+    _alias_version = get_installation_version()
 
     def app_alias(self, alias_name):
         # It is VERY important to have the variables declared WITHIN the function
@@ -24,6 +25,7 @@ class Bash(Generic):
                 fi
                 export FUCK_SHELL=bash;
                 export FUCK_ALIAS={name};
+                export FUCK_ALIAS_VERSION="{alias_version}";
                 export FUCK_SHELL_ALIASES=$(alias);
                 export FUCK_HISTORY=$(fc -ln -10);
                 export FUCK_PROMPT="$*";
@@ -39,6 +41,7 @@ class Bash(Generic):
         '''.format(
             name=alias_name,
             argument_placeholder=ARGUMENT_PLACEHOLDER,
+            alias_version=self._alias_version,
             alter_history=('history -s $FUCK_CMD;'
                            if settings.alter_history else ''))
 

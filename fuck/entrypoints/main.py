@@ -22,6 +22,12 @@ def _is_setup_command(known_args):
         'setup', 'ai-setup'))
 
 
+def _called_via_alias():
+    return bool(os.environ.get('FUCK_PROMPT') or
+                os.environ.get('FUCK_COMMAND') or
+                os.environ.get('FUCK_HISTORY'))
+
+
 def main():
     parser = Parser()
     known_args = parser.parse(sys.argv)
@@ -37,6 +43,13 @@ def main():
     elif known_args.alias:
         print_alias(known_args)
     elif _is_setup_command(known_args):
+        if _called_via_alias():
+            if known_args.setup:
+                print('command fuck --setup')
+            else:
+                setup_cmd = ' '.join(known_args.command)
+                print('command fuck {}'.format(setup_cmd))
+            return
         setup()
     elif known_args.command or 'FUCK_HISTORY' in os.environ:
         fix_command(known_args)

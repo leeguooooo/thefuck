@@ -5,8 +5,25 @@ from .shells import shell
 from .conf import settings, load_source
 from .const import DEFAULT_PRIORITY, ALL_ENABLED
 from .exceptions import EmptyCommand
-from .utils import get_alias, format_raw_script
+from .utils import get_alias, format_raw_script, get_installation_version
 from .output_readers import get_output
+
+
+def _should_refresh_alias():
+    if not (os.environ.get('FUCK_PROMPT') or
+            os.environ.get('FUCK_COMMAND') or
+            os.environ.get('FUCK_HISTORY')):
+        return False
+
+    current_version = get_installation_version()
+    if not current_version or current_version == 'unknown':
+        return False
+
+    alias_version = os.environ.get('FUCK_ALIAS_VERSION')
+    if not alias_version:
+        return True
+
+    return alias_version != current_version
 
 
 class Command(object):
@@ -240,9 +257,14 @@ class CorrectedCommand(object):
                 get_alias(),
                 '--debug ' if settings.debug else '',
                 shell.quote(self.script))
-            return shell.or_(self.script, repeat_fuck)
+            script = shell.or_(self.script, repeat_fuck)
         else:
-            return self.script
+            script = self.script
+
+        if _should_refresh_alias():
+            refresh_cmd = shell.alias_refresh_command()
+            return u'{}; {}'.format(refresh_cmd, script)
+        return script
 
     def run(self, old_cmd):
         """Runs command from rule for passed command.
